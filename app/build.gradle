@@ -1,18 +1,25 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
     namespace 'com.irv205.challengedecember'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.irv205.challengedecember"
         minSdk 21
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
+
+        buildConfigField "String", "TS", "\"1670872598\""
+        buildConfigField "String", "API_KEY", "\"affc78e596aba13dc554cc4796af161c\""
+        buildConfigField "String", "HASH", "\"765abc252101fabc31596b8a856c8a3e\""
+        buildConfigField "String", "API_BASE_URL", "\"https://gateway.marvel.com:443/v1/public/\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -48,16 +55,37 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
-    implementation 'androidx.activity:activity-compose:1.3.1'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation 'androidx.activity:activity-compose:1.6.1'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
-    implementation 'androidx.compose.material:material:1.1.1'
+    implementation 'androidx.compose.material:material:1.3.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
+
+    // NETWORK
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation "com.squareup.okhttp3:okhttp:5.0.0-alpha.10"
+    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.10"
+    implementation 'com.google.code.gson:gson:2.9.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    //Compose ViewModel
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
+
+    // Compose LiveData
+    implementation "androidx.compose.runtime:runtime-livedata:1.3.2"
+
+    // Compose Navigation and Hilt
+    implementation "com.google.dagger:hilt-android:2.44"
+
+    kapt "com.google.dagger:hilt-android-compiler:2.44"
+    //implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    def nav_version = "2.5.3"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
 }
