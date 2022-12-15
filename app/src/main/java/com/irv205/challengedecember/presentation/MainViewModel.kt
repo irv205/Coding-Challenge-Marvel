@@ -7,10 +7,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.irv205.challengedecember.di.IODispatcher
-import com.irv205.challengedecember.di.MainDisplatcher
+import com.irv205.challengedecember.core.di.IODispatcher
+import com.irv205.challengedecember.core.di.MainDisplatcher
 import com.irv205.challengedecember.domain.DomainResponse
+import com.irv205.challengedecember.domain.model.Comics
 import com.irv205.challengedecember.domain.model.Hero
+import com.irv205.challengedecember.domain.model.Series
 import com.irv205.challengedecember.domain.repository.MarvelRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -28,6 +30,12 @@ class MainViewModel @Inject constructor(
     private val _list = mutableStateListOf<Hero>()
     val list : SnapshotStateList<Hero> get() = _list
 
+    private val _listComics = mutableStateListOf<Comics>()
+    val listComics : SnapshotStateList<Comics> get() = _listComics
+
+    private val _listSeries = mutableStateListOf<Series>()
+    val listSeries : SnapshotStateList<Series> get() = _listSeries
+
     private val _selectedHero = mutableStateOf<Hero?>(null)
     val selectedHero : State<Hero?> get() = _selectedHero
 
@@ -37,6 +45,8 @@ class MainViewModel @Inject constructor(
 
     init {
         getHeroesList()
+        getComicsList()
+        getSeriesList()
     }
 
     private fun getHeroesList(){
@@ -52,6 +62,49 @@ class MainViewModel @Inject constructor(
                     withContext(mainDispatcher){
                         _list.clear()
                         _list.addAll(result.data)
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getComicsList(){
+
+        viewModelScope.launch(ioDispatcher) {
+            when(val result = repository.getComics(1009146)){
+                is DomainResponse.OnFailure -> {
+                    withContext(mainDispatcher){
+                        Log.e("ERRORRRRR", result.message)
+                    }
+                }
+                is DomainResponse.Success -> {
+
+
+                    withContext(mainDispatcher){
+                        _listComics.clear()
+                        _listComics.addAll(result.data)
+                        _listComics.addAll(result.data)
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getSeriesList(){
+
+        viewModelScope.launch(ioDispatcher) {
+            when(val result = repository.getSeries(1009146)){
+                is DomainResponse.OnFailure -> {
+                    withContext(mainDispatcher){
+                        Log.e("ERRORRRRR", result.message)
+                    }
+                }
+                is DomainResponse.Success -> {
+                    withContext(mainDispatcher){
+                        _listSeries.clear()
+                        _listSeries.addAll(result.data)
 
                     }
                 }

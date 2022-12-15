@@ -1,64 +1,423 @@
 package com.irv205.challengedecember.presentation.home
 
-import androidx.compose.foundation.clickable
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import coil.compose.rememberAsyncImagePainter
+import com.irv205.challengedecember.domain.model.Comics
 import com.irv205.challengedecember.domain.model.Hero
+import com.irv205.challengedecember.domain.model.Series
 import com.irv205.challengedecember.presentation.MainViewModel
-import com.irv205.challengedecember.presentation.main.HeaderView
+import com.irv205.challengedecember.presentation.ui.theme.SecondaryColor
 
 @Composable
 fun HomeView(
     vm: MainViewModel,
     onItemClick: () -> Unit
-){
+) {
     val list = remember { vm.list }
-    HomeBody(list = list,onItemClick = { onItemClick.invoke()
-        vm.setHero(it) })
+    val listComics = remember { vm.listComics }
+    val listSeries = remember { vm.listSeries }
+    HomeBody(list = list, series = listSeries, comics = listComics, onItemClick = {
+        onItemClick.invoke()
+        vm.setHero(it)
+
+    })
 }
 
 @Composable
 fun HomeBody(
+    series: List<Series>,
+    comics: List<Comics>,
     modifier: Modifier = Modifier,
     list: List<Hero> = emptyList(),
     onItemClick: (Hero) -> Unit
-){
-    LazyColumn(modifier = modifier){
-        items(list) { item ->
-            Divider(color = MaterialTheme.colors.onBackground)
-            ItemList(hero = item){
-                onItemClick(it)
+) {
+
+    val state = rememberLazyListState()
+    val elements = mutableListOf<Hero>()
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colors.background
+    ) {
+        LazyColumn(modifier = modifier) {
+            items(list) { item ->
+                MyCard(item, 0, 1, state, series, comics)
             }
         }
     }
 }
 
+class SampleHeroProvider : PreviewParameterProvider<Hero> {
+    override val values = sequenceOf(
+        Hero(
+            "Demo",
+            "Lorem",
+            "https://cdn.pixabay.com/photo/2015/03/11/01/33/hulk-667988_960_720.jpg",
+            emptyList(),
+            emptyList(),
+            emptyList()
+        )
+    )
+}
+
+
 @Composable
-fun ItemList(
-    hero: Hero,
-    onItemClick: (Hero) -> Unit
-){
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Row(modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth()
-                .padding(10.dp)
-                .clickable {
-                    onItemClick(hero)
-                },
-            horizontalArrangement = Arrangement.SpaceEvenly) {
-            Text(text = hero.name)
-            //Text(text = hero.thumbnail)
+fun MyCard(
+    @PreviewParameter(SampleHeroProvider::class)
+    character: Hero,
+    index: Int = 0,
+    columns: Int = 1,
+    state: LazyListState,
+    series: List<Series>,
+    comics: List<Comics>,
+) {
+
+    //Animation Card
+    val (delay, easing) = state.calculateDelayAndEasing(index, columns)
+    val animation = tween<Float>(durationMillis = 1200, delayMillis = delay, easing = easing)
+    val args = ScaleAndAlphaArgs(fromScale = 10f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
+    val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
+
+    val argsRotation = RotationArgs(fromRotation = 80f, toRotation = 0f)
+    val animationRotate = tween<Float>(durationMillis = 1300, delayMillis = delay, easing = easing)
+    val rotation = rotation(argsRotation, animationRotate)
+
+    val animationText = tween<Float>(durationMillis = 3000, delayMillis = delay, easing = easing)
+    val argsText = ScaleAndAlphaArgs(fromScale = 400f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
+    val (scaleText, alphaText) = scaleAndAlpha(args = argsText, animation = animationText)
+
+
+    Card(
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+            //.graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale)
+            .graphicsLayer(
+                alpha = alpha,
+                scaleX = scale,
+                scaleY = scale,
+                rotationX = rotation,
+                rotationY = 0.0F,
+                rotationZ = 0.0F
+            )
+            .animateContentSize(
+                animationSpec = TweenSpec(
+                    durationMillis = 2000,
+                    easing = LinearOutSlowInEasing,
+
+                    )
+            )
+    ) {
+
+        Box {
+
+            Image(
+                painter = rememberAsyncImagePainter(character.thumbnail),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(18.dp))
+                    .height(550.dp)
+                    .fillMaxWidth()
+                /*.graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale, rotationX = 0.0F, rotationY = 0.0F, rotationZ = rotation)
+            .animateContentSize(
+                animationSpec = TweenSpec(
+                    durationMillis = 3000,
+                    easing = LinearOutSlowInEasing,
+
+                    )
+            )*/
+            )
+
+            Column(
+                modifier = Modifier
+                    .size(700.dp)
+                    .zIndex(2.0F)
+                    .graphicsLayer(
+                        alpha = alpha,
+                        scaleX = scale,
+                        scaleY = scale,
+                        rotationX = rotation,
+                        rotationY = 0.0F,
+                        rotationZ = 0.0F
+                    )
+                    .animateContentSize(
+                        animationSpec = TweenSpec(
+                            durationMillis = 3000,
+                            easing = LinearOutSlowInEasing,
+
+                            )
+                    )
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha= 0.7F),
+                                Color.Black,
+                                Color.Black
+                            )
+                        )
+                    )
+                    .zIndex(1.0F)
+                    .height(700.dp)
+                    .fillMaxWidth()
+            ) {
+
+                Text(
+                    text = character.name,
+                    modifier = Modifier
+                        .padding(top = 250.dp, start = 8.dp)
+                        .graphicsLayer(cameraDistance = scaleText)
+                        .animateContentSize(
+                            animationSpec = TweenSpec(
+                                durationMillis = 3000,
+                                easing = LinearOutSlowInEasing,
+
+                                )
+                        )
+                        .background(Color.Transparent),
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Box(Modifier.padding(8.dp)) {
+                    Divider(
+                        Modifier
+                            .height(6.dp)
+                            .width(40.dp)
+                            .background(SecondaryColor)
+                            .padding(start = 12.dp, top = 4.dp)
+                    )
+                }
+
+                Text(
+                    text = character.description?.take(100) ?: "",
+                    modifier = Modifier.padding(top = 12.dp, start = 8.dp),
+                    fontSize = 15.sp
+                )
+
+                Text(
+                    text = "Series",
+                    modifier = Modifier.padding(8.dp),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                MyLazyRowSeries(series)
+
+                Text(
+                    text = "Comics",
+                    modifier = Modifier.padding(8.dp),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                MyLazyRowComics(comics)
+
+                //MyButton(character.series)
+            }
+
+
         }
+
+
+    }
+}
+
+
+@Composable
+private fun LazyListState.calculateDelayAndEasing(index: Int, columnCount: Int): Pair<Int, Easing> {
+    val row = index / columnCount
+    val column = index % columnCount
+    val firstVisibleRow = firstVisibleItemIndex
+    val visibleRows = layoutInfo.visibleItemsInfo.count()
+    val scrollingToBottom = firstVisibleRow < row
+    val isFirstLoad = visibleRows == 0
+    val rowDelay = 300 * when {
+        isFirstLoad -> row // initial load
+        scrollingToBottom -> visibleRows + firstVisibleRow - row // scrolling to bottom
+        else -> 1 // scrolling to top
+    }
+    val scrollDirectionMultiplier = if (scrollingToBottom || isFirstLoad) 1 else -1
+    val columnDelay = column * 150 * scrollDirectionMultiplier
+    val easing =
+        if (scrollingToBottom || isFirstLoad) LinearOutSlowInEasing else FastOutSlowInEasing
+    return rowDelay + columnDelay to easing
+}
+
+
+@Composable
+fun scaleAndAlpha(
+    args: ScaleAndAlphaArgs,
+    animation: FiniteAnimationSpec<Float>
+): Pair<Float, Float> {
+    val transitionState =
+        remember { MutableTransitionState(State.PLACING).apply { targetState = State.PLACED } }
+    val transition = updateTransition(transitionState)
+    val alpha by transition.animateFloat(transitionSpec = { animation }, label = "") { state ->
+        when (state) {
+            State.PLACING -> args.fromAlpha
+            State.PLACED -> args.toAlpha
+        }
+    }
+    val scale by transition.animateFloat(transitionSpec = { animation }, label = "") { state ->
+        when (state) {
+            State.PLACING -> args.fromScale
+            State.PLACED -> args.toScale
+        }
+    }
+    return alpha to scale
+}
+
+@Composable
+fun rotation(
+    args: RotationArgs,
+    animation: FiniteAnimationSpec<Float>
+): Float {
+    val transitionState =
+        remember { MutableTransitionState(State.PLACING).apply { targetState = State.PLACED } }
+    val transition = updateTransition(transitionState)
+
+    val rotation by transition.animateFloat(transitionSpec = { animation }, label = "") { state ->
+        when (state) {
+            State.PLACING -> args.fromRotation
+            State.PLACED -> args.toRotation
+        }
+    }
+    return rotation
+}
+
+private enum class State { PLACING, PLACED }
+
+data class ScaleAndAlphaArgs(
+    val fromScale: Float,
+    val toScale: Float,
+    val fromAlpha: Float,
+    val toAlpha: Float
+)
+
+data class RotationArgs(
+    val fromRotation: Float,
+    val toRotation: Float,
+)
+
+
+@Composable
+fun MyButton(resourceURI: String?) {
+    val context = LocalContext.current
+    val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(resourceURI)) }
+
+    Button(onClick = { context.startActivity(intent) }) {
+        Text(text = "Details")
+    }
+}
+
+
+@Composable
+fun MyLazyRowComics(comics: List<Comics>) {
+    val list = comics
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+    ) {
+        items(items = list, itemContent = { item ->
+            Box(
+                Modifier
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(12.dp))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .size(120.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+
+                    ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(item.thumbnail),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillHeight,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .fillMaxWidth()
+                            .fillMaxWidth()
+                    )
+                    Text(
+                        text = item.name,
+                        modifier = Modifier.padding(4.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        })
+    }
+}
+
+@Composable
+fun MyLazyRowSeries(series: List<Series>) {
+    val list = series
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+    ) {
+        items(items = list, itemContent = { item ->
+            Box(
+                Modifier
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(12.dp))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .size(120.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+
+                    ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(item.thumbnail),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .fillMaxWidth()
+                            .fillMaxWidth()
+                    )
+                    Text(
+                        text = item.name,
+                        modifier = Modifier.padding(4.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        })
     }
 }

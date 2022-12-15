@@ -16,10 +16,10 @@ android {
         versionCode 1
         versionName "1.0"
 
-        buildConfigField "String", "TS", "\"1670872598\""
-        buildConfigField "String", "API_KEY", "\"affc78e596aba13dc554cc4796af161c\""
-        buildConfigField "String", "HASH", "\"765abc252101fabc31596b8a856c8a3e\""
+        buildConfigField "String", "MY_PUBLIC_KEY", "\"0a5545b0111527363a28a64f53b7002f\""
+        buildConfigField "String", "MY_PRIVATE_KEY", "\"ca0bbcf58f1625b8c134fd4099ada7c4dcf2b936\""
         buildConfigField "String", "API_BASE_URL", "\"https://gateway.marvel.com:443/v1/public/\""
+        //buildConfigField "String", "API_BASE_URL", "\"https://fe1d5c02-6122-4580-b002-6e36d8c23dab.mock.pstmn.io/\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -51,6 +51,14 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs += [
+                "-Xjvm-default=all",
+        ]
+    }
+
 }
 
 dependencies {
@@ -67,6 +75,7 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
+    implementation 'io.coil-kt:coil-compose:2.2.2'
 
     // NETWORK
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
@@ -88,4 +97,9 @@ dependencies {
     //implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     def nav_version = "2.5.3"
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    //Compose ViewModel
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
+
+
 }

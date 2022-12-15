@@ -12,7 +12,7 @@ import com.irv205.challengedecember.presentation.MainViewModel
 import com.irv205.challengedecember.presentation.detail.DetailView
 import com.irv205.challengedecember.presentation.home.HomeBody
 import com.irv205.challengedecember.presentation.home.HomeView
-import com.irv205.challengedecember.ui.theme.ChallengeDecemberTheme
+import com.irv205.challengedecember.presentation.ui.theme.ChallengeDecemberTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,6 +24,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val vm: MainViewModel = viewModel()
                 NavHost(
+
                     navController = navController, startDestination = NavigationViews.HomeView.route){
                     composable(NavigationViews.HomeView.route) {
                         HomeView(vm) { navController.navigate(NavigationViews.DetailView.route) }
