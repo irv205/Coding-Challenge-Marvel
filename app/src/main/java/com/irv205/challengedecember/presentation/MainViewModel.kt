@@ -39,6 +39,9 @@ class MainViewModel @Inject constructor(
     private val _selectedHero = mutableStateOf<Hero?>(null)
     val selectedHero : State<Hero?> get() = _selectedHero
 
+    private val _search = mutableStateOf("")
+    val search : State<String?> get() = _search
+
     fun setHero(hero: Hero){
         _selectedHero.value = hero
     }
@@ -47,24 +50,33 @@ class MainViewModel @Inject constructor(
         getHeroesList()
     }
 
-    private fun getHeroesList(){
+    fun updateSearchText(text: CharSequence?) {
+        _search.value = text.toString()
+        Log.d("String",text.toString())
+    }
 
-        viewModelScope.launch(ioDispatcher) {
-            when(val result = repository.getHeroes(100)){
-                is DomainResponse.OnFailure -> {
-                    withContext(mainDispatcher){
-                        Log.e("ERRORRRRR", result.message)
+    fun getHeroesList(){
+        var keyword = "A"
+        if(search.value?.isEmpty() == false){
+            keyword = search.value.toString()
+        }
+
+            viewModelScope.launch(ioDispatcher) {
+                when(val result = repository.getHeroes(40,keyword )){
+                    is DomainResponse.OnFailure -> {
+                        withContext(mainDispatcher){
+                            Log.e("ERRORRRRR", result.message)
+                        }
                     }
-                }
-                is DomainResponse.Success -> {
-                    withContext(mainDispatcher){
-                        _list.clear()
-                        _list.addAll(result.data)
+                    is DomainResponse.Success -> {
+                        withContext(mainDispatcher){
+                            _list.clear()
+                            _list.addAll(result.data)
 
+                        }
                     }
                 }
             }
-        }
     }
 
 
@@ -110,5 +122,6 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
 
 }

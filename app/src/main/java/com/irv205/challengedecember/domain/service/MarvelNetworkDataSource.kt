@@ -6,7 +6,7 @@ import com.irv205.challengedecember.domain.model.Hero
 import com.irv205.challengedecember.domain.model.Series
 
 interface MarvelNetworkDataSource {
-    suspend fun getHeroes(limit: Int): DomainResponse<List<Hero>>
+    suspend fun getHeroes(limit: Int,name:String): DomainResponse<List<Hero>>
     suspend fun getSeries(character: Int): DomainResponse<List<Series>>
     suspend fun getComics(character: Int): DomainResponse<List<Comics>>
 }

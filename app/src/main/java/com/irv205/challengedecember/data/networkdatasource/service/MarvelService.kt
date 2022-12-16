@@ -10,7 +10,7 @@ import retrofit2.http.Query
 interface MarvelService {
 
     @GET("characters")
-    suspend fun getCharacters(@Query("limit") limit: Int): DataResponseDTO
+    suspend fun getCharacters(@Query("limit") limit: Int,@Query("nameStartsWith") name : String): DataResponseDTO
 
     @GET("characters/{character}/series")
     suspend fun getSeries(@Path("character")  character : Int): SerieResponseDTO

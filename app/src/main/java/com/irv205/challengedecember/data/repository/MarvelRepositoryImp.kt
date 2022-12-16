@@ -11,9 +11,9 @@ import javax.inject.Inject
 class MarvelRepositoryImp @Inject constructor(
     private val networkDataSource: MarvelNetworkDataSource): MarvelRepository {
 
-    override suspend fun getHeroes(limit: Int): DomainResponse<List<Hero>> {
+    override suspend fun getHeroes(limit: Int,name:String): DomainResponse<List<Hero>> {
         return try {
-            networkDataSource.getHeroes(limit)
+            networkDataSource.getHeroes(limit,name)
         } catch (e: Exception){
             DomainResponse.OnFailure(e.toString())
         }
