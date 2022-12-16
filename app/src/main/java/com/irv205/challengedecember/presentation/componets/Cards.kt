@@ -144,7 +144,7 @@ fun MyCard(
 
                     text = character.name,
                     modifier = Modifier
-                        .padding(top = 190.dp, start = 8.dp)
+                        .padding(top = 200.dp, start = 8.dp, bottom = 10.dp)
                         .graphicsLayer(cameraDistance = scaleText)
                         .animateContentSize(
                             animationSpec = TweenSpec(

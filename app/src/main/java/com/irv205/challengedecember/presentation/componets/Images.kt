@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -66,3 +67,17 @@ fun GifImage(
     }
 
 }
+
+@Composable
+fun ImageLogo(){
+    Image(
+        painter = rememberAsyncImagePainter("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Marvel_Logo.svg/2560px-Marvel_Logo.svg.png"),
+        contentDescription = null,
+        contentScale = ContentScale.FillHeight,
+        modifier = Modifier
+            .fillMaxWidth().padding(top=12.dp, bottom = 0.dp)
+            .height(35.dp)
+    )
+}
+
+

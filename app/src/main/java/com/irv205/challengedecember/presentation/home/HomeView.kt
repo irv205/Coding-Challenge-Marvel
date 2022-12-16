@@ -1,6 +1,7 @@
 package com.irv205.challengedecember.presentation.home
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,10 +16,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.irv205.challengedecember.R
 import com.irv205.challengedecember.domain.model.Comics
@@ -26,6 +29,7 @@ import com.irv205.challengedecember.domain.model.Hero
 import com.irv205.challengedecember.domain.model.Series
 import com.irv205.challengedecember.presentation.MainViewModel
 import com.irv205.challengedecember.presentation.componets.GifImage
+import com.irv205.challengedecember.presentation.componets.ImageLogo
 import com.irv205.challengedecember.presentation.componets.MyCard
 import com.irv205.challengedecember.presentation.componets.MyCardLandScape
 import com.irv205.challengedecember.presentation.ui.theme.PrimaryColor
@@ -69,12 +73,12 @@ fun HomeBody(
     var selectedPosition by remember { mutableStateOf(true) }
 
     val onItemClick = { index: Int, position: Boolean ->
-        viewModel.getSeriesList(list.get(index).id)
-        viewModel.getComicsList(list.get(index).id)
-        if (selectedIndex == index)
-            selectedIndex = -1
+        viewModel.getSeriesList(list[index].id)
+        viewModel.getComicsList(list[index].id)
+        selectedIndex = if (selectedIndex == index)
+            -1
         else
-            selectedIndex = index
+            index
 
         selectedPosition = position
     }
@@ -87,9 +91,8 @@ fun HomeBody(
         color = MaterialTheme.colors.background
     ) {
 
-        val search = remember { viewModel.search.value }
-
         Column {
+            ImageLogo()
             Row {
                 TextField(
                     modifier = Modifier
@@ -97,8 +100,8 @@ fun HomeBody(
                         .padding(top = 12.dp, bottom = 10.dp, start = 8.dp, end = 8.dp)
                         .clip(RoundedCornerShape(18.dp)),
                     value = viewModel.search.value.toString(),
-                    onValueChange = { it ->
-                        viewModel.updateSearchText(it)
+                    onValueChange = {text ->
+                        viewModel.updateSearchText(text)
                     },
                     placeholder = { Text(text = stringResource(R.string.hint_search_query)) },
                     maxLines = 1,
@@ -117,7 +120,7 @@ fun HomeBody(
                         Icons.Filled.Search,
                         stringResource(R.string.Details),
                         modifier = Modifier
-                            .size(60.dp)
+                            .size(50.dp)
                             .padding(8.dp)
                             .fillMaxWidth()
                             .clickable {
