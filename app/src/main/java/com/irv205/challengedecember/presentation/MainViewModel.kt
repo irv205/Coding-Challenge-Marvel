@@ -50,7 +50,7 @@ class MainViewModel @Inject constructor(
     private fun getHeroesList(){
 
         viewModelScope.launch(ioDispatcher) {
-            when(val result = repository.getHeroes()){
+            when(val result = repository.getHeroes(100)){
                 is DomainResponse.OnFailure -> {
                     withContext(mainDispatcher){
                         Log.e("ERRORRRRR", result.message)

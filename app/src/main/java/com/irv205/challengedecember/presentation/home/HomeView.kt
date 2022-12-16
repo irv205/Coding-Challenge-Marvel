@@ -3,6 +3,7 @@ package com.irv205.challengedecember.presentation.home
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,7 +94,7 @@ fun HomeBody(
                         MyCardLandScape(
                             item,
                             index,
-                            2,
+                            1,
                             state,
                             series,
                             comics,
@@ -124,7 +127,7 @@ fun MyCard(
 
     //Animation Card
     val (delay, easing) = state.calculateDelayAndEasing(index, columns)
-    val animation = tween<Float>(durationMillis = 700, delayMillis = delay, easing = easing)
+    val animation = tween<Float>(durationMillis = 500, delayMillis = delay, easing = easing)
     val args = ScaleAndAlphaArgs(fromScale = 10f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
     val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
 
@@ -132,7 +135,7 @@ fun MyCard(
     val animationRotate = tween<Float>(durationMillis = 1300, delayMillis = delay, easing = easing)
     val rotation = rotation(argsRotation, animationRotate)
 
-    val animationText = tween<Float>(durationMillis = 700, delayMillis = delay, easing = easing)
+    val animationText = tween<Float>(durationMillis = 500, delayMillis = delay, easing = easing)
     val argsText = ScaleAndAlphaArgs(fromScale = 400f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
     val (scaleText, alphaText) = scaleAndAlpha(args = argsText, animation = animationText)
 
@@ -153,7 +156,7 @@ fun MyCard(
             )
             .animateContentSize(
                 animationSpec = TweenSpec(
-                    durationMillis = 1000,
+                    durationMillis = 500,
                     easing = LinearOutSlowInEasing,
 
                     )
@@ -172,24 +175,16 @@ fun MyCard(
                 modifier = Modifier
                     .clip(RoundedCornerShape(18.dp))
                     .fillMaxWidth()
-                    .fillMaxWidth()
+                    .fillMaxHeight()
             )
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .zIndex(2.0F)
-                    /*.graphicsLayer(
-                        alpha = alpha,
-                        scaleX = scale,
-                        scaleY = scale,
-                        rotationX = rotation,
-                        rotationY = 0.0F,
-                        rotationZ = 0.0F
-                    )*/
                     .animateContentSize(
                         animationSpec = TweenSpec(
-                            durationMillis = 800,
+                            durationMillis = 500,
                             easing = LinearOutSlowInEasing,
 
                             )
@@ -200,23 +195,31 @@ fun MyCard(
                                 Color.Transparent,
                                 MaterialTheme.colors.surface.copy(alpha = 0.7F),
                                 MaterialTheme.colors.surface,
-
-                                )
+                            )
                         )
                     )
                     .zIndex(1.0F)
-                    .height(700.dp)
+                    .fillMaxHeight()
                     .fillMaxWidth()
             ) {
+                Box(
+                    contentAlignment = Alignment.BottomEnd,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    character.url?.get(0)?.let {
+                        MyIconButon(it)
+                    }
+                }
+
 
                 Text(
                     text = character.name,
                     modifier = Modifier
-                        .padding(top = 250.dp, start = 8.dp)
+                        .padding(top = 200.dp, start = 8.dp)
                         .graphicsLayer(cameraDistance = scaleText)
                         .animateContentSize(
                             animationSpec = TweenSpec(
-                                durationMillis = 1000,
+                                durationMillis = 500,
                                 easing = LinearOutSlowInEasing,
 
                                 )
@@ -270,6 +273,22 @@ fun MyCard(
     }
 }
 
+@Composable
+fun MyIconButon(url : String) {
+    val context = LocalContext.current
+    val intent = remember { Intent(Intent.ACTION_VIEW, Uri.parse(url)) }
+
+    Icon(
+        Icons.Filled.Info,
+        "Details",
+        modifier = Modifier
+            .size(50.dp)
+            .padding(top = 12.dp, end = 8.dp).clickable {
+                context.startActivity(intent)
+            },
+    )
+}
+
 
 @Composable
 fun MyCardLandScape(
@@ -285,7 +304,7 @@ fun MyCardLandScape(
 
     //Animation Card
     val (delay, easing) = state.calculateDelayAndEasing(index, columns)
-    val animation = tween<Float>(durationMillis = 700, delayMillis = delay, easing = easing)
+    val animation = tween<Float>(durationMillis = 500, delayMillis = delay, easing = easing)
     val args = ScaleAndAlphaArgs(fromScale = 10f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
     val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
 
@@ -293,7 +312,7 @@ fun MyCardLandScape(
     val animationRotate = tween<Float>(durationMillis = 1300, delayMillis = delay, easing = easing)
     val rotation = rotation(argsRotation, animationRotate)
 
-    val animationText = tween<Float>(durationMillis = 700, delayMillis = delay, easing = easing)
+    val animationText = tween<Float>(durationMillis = 500, delayMillis = delay, easing = easing)
     val argsText = ScaleAndAlphaArgs(fromScale = 400f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
     val (scaleText, alphaText) = scaleAndAlpha(args = argsText, animation = animationText)
 
@@ -310,12 +329,10 @@ fun MyCardLandScape(
                 scaleX = scale,
                 scaleY = scale,
                 rotationX = rotation,
-                rotationY = 0.0F,
-                rotationZ = 0.0F
             )
             .animateContentSize(
                 animationSpec = TweenSpec(
-                    durationMillis = 1000,
+                    durationMillis = 500,
                     easing = LinearOutSlowInEasing,
 
                     )
@@ -337,13 +354,14 @@ fun MyCardLandScape(
                         .fillMaxWidth(0.4F)
                         .padding(end = 8.dp)
                 )
+
                 LazyColumn(
                     modifier = Modifier
                         .size(700.dp)
                         .zIndex(2.0F)
                         .animateContentSize(
                             animationSpec = TweenSpec(
-                                durationMillis = 800,
+                                durationMillis = 500,
                                 easing = LinearOutSlowInEasing,
 
                                 )
@@ -370,7 +388,7 @@ fun MyCardLandScape(
                                 .graphicsLayer(cameraDistance = scaleText)
                                 .animateContentSize(
                                     animationSpec = TweenSpec(
-                                        durationMillis = 1000,
+                                        durationMillis = 500,
                                         easing = LinearOutSlowInEasing,
 
                                         )
@@ -435,13 +453,13 @@ private fun LazyListState.calculateDelayAndEasing(index: Int, columnCount: Int):
     val visibleRows = layoutInfo.visibleItemsInfo.count()
     val scrollingToBottom = firstVisibleRow < row
     val isFirstLoad = visibleRows == 0
-    val rowDelay = 300 * when {
+    val rowDelay = 100 * when {
         isFirstLoad -> row // initial load
         scrollingToBottom -> visibleRows + firstVisibleRow - row // scrolling to bottom
         else -> 1 // scrolling to top
     }
     val scrollDirectionMultiplier = if (scrollingToBottom || isFirstLoad) 1 else -1
-    val columnDelay = column * 150 * scrollDirectionMultiplier
+    val columnDelay = column * 100 * scrollDirectionMultiplier
     val easing =
         if (scrollingToBottom || isFirstLoad) LinearOutSlowInEasing else FastOutSlowInEasing
     return rowDelay + columnDelay to easing

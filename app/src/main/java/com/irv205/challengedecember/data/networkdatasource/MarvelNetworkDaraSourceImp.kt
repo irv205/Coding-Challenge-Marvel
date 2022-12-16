@@ -11,8 +11,8 @@ import com.irv205.challengedecember.domain.service.MarvelNetworkDataSource
 import javax.inject.Inject
 
 class MarvelNetworkDaraSourceImp @Inject constructor(private val service: MarvelService): MarvelNetworkDataSource {
-    override suspend fun getHeroes(): DomainResponse<List<Hero>> {
-        val response = service.getCharacters()
+    override suspend fun getHeroes(limit: Int ): DomainResponse<List<Hero>> {
+        val response = service.getCharacters(limit)
         return DomainResponse.Success(response.toDomainModel())
     }
 

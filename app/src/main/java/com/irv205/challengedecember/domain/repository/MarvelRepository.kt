@@ -7,7 +7,7 @@ import com.irv205.challengedecember.domain.model.Series
 
 
 interface MarvelRepository {
-    suspend fun getHeroes(): DomainResponse<List<Hero>>
+    suspend fun getHeroes(limit: Int): DomainResponse<List<Hero>>
 
     suspend fun getSeries(character : Int): DomainResponse<List<Series>>
 
