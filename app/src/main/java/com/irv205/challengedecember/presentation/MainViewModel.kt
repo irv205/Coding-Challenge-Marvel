@@ -45,8 +45,6 @@ class MainViewModel @Inject constructor(
 
     init {
         getHeroesList()
-        getComicsList()
-        getSeriesList()
     }
 
     private fun getHeroesList(){
@@ -69,10 +67,11 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun getComicsList(){
+
+    fun getComicsList(id : Int){
 
         viewModelScope.launch(ioDispatcher) {
-            when(val result = repository.getComics(1009146)){
+            when(val result = repository.getComics(id)){
                 is DomainResponse.OnFailure -> {
                     withContext(mainDispatcher){
                         Log.e("ERRORRRRR", result.message)
@@ -92,10 +91,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun getSeriesList(){
+    fun getSeriesList(id: Int){
 
         viewModelScope.launch(ioDispatcher) {
-            when(val result = repository.getSeries(1009146)){
+            when(val result = repository.getSeries(id)){
                 is DomainResponse.OnFailure -> {
                     withContext(mainDispatcher){
                         Log.e("ERRORRRRR", result.message)

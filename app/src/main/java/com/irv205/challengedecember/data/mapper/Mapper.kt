@@ -21,7 +21,8 @@ fun HeroDTO.toDomain(): Hero{
         thumbnail?.path?.replace("http", "https")+"."+thumbnail?.extension,
         comics?.items?.map { it.name } ?: emptyList(),
         series?.items?.map { it.name } ?: emptyList(),
-        urls.map { it?.url ?: "" }
+        urls.map { it?.url ?: ""},
+        id ?: 0
     )
 }
 

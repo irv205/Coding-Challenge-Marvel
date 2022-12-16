@@ -6,5 +6,6 @@ data class HeroDTO(
     val thumbnail: ThumbnailDTO?,
     val comics: ComicDTO?,
     val series: SerieTDO?,
-    val urls: List<UrlDTO?>
+    val urls: List<UrlDTO?>,
+    val id: Int?,
 )

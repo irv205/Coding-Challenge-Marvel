@@ -7,5 +7,6 @@ data class Hero(
     val thumbnail: String,
     val comic: List<String>,
     val series: List<String>,
-    val url: List<String>
+    val url: List<String>,
+    val id: Int
 )

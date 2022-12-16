@@ -1,18 +1,18 @@
 package com.irv205.challengedecember.presentation.home
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,11 +20,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -43,11 +42,13 @@ fun HomeView(
     val list = remember { vm.list }
     val listComics = remember { vm.listComics }
     val listSeries = remember { vm.listSeries }
-    HomeBody(list = list, series = listSeries, comics = listComics, onItemClick = {
-        onItemClick.invoke()
-        vm.setHero(it)
-
-    })
+    HomeBody(
+        list = list, series = listSeries, comics = listComics, viewModel = vm,
+        onItemClick = {
+            onItemClick.invoke()
+            vm.setHero(it)
+        },
+    )
 }
 
 @Composable
@@ -56,51 +57,74 @@ fun HomeBody(
     comics: List<Comics>,
     modifier: Modifier = Modifier,
     list: List<Hero> = emptyList(),
-    onItemClick: (Hero) -> Unit
-) {
+    viewModel: MainViewModel,
+    onItemClick: (Hero) -> Unit,
+
+    ) {
+
+    var selectedIndex by remember { mutableStateOf(-1) }
+    var selectedPosition by remember { mutableStateOf(true) }
+
+    val onItemClick = { index: Int, position: Boolean ->
+        viewModel.getSeriesList(list.get(index).id)
+        viewModel.getComicsList(list.get(index).id)
+        if (selectedIndex == index)
+            selectedIndex = -1
+        else
+            selectedIndex = index
+
+        selectedPosition = position
+    }
 
     val state = rememberLazyListState()
     val elements = mutableListOf<Hero>()
+    val configuration = LocalConfiguration.current
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
         LazyColumn(modifier = modifier) {
-            items(list) { item ->
-                MyCard(item, 0, 1, state, series, comics)
+            itemsIndexed(list) { index, item ->
+                when (configuration.orientation) {
+                    Configuration.ORIENTATION_LANDSCAPE -> {
+                        MyCardLandScape(
+                            item,
+                            index,
+                            2,
+                            state,
+                            series,
+                            comics,
+                            selectedIndex,
+                            onItemClick
+                        )
+                    }
+                    else -> {
+                        MyCard(item, index, 1, state, series, comics, selectedIndex, onItemClick)
+                    }
+                }
+
             }
         }
     }
 }
 
-class SampleHeroProvider : PreviewParameterProvider<Hero> {
-    override val values = sequenceOf(
-        Hero(
-            "Demo",
-            "Lorem",
-            "https://cdn.pixabay.com/photo/2015/03/11/01/33/hulk-667988_960_720.jpg",
-            emptyList(),
-            emptyList(),
-            emptyList()
-        )
-    )
-}
-
 
 @Composable
 fun MyCard(
-    @PreviewParameter(SampleHeroProvider::class)
     character: Hero,
     index: Int = 0,
     columns: Int = 1,
     state: LazyListState,
     series: List<Series>,
     comics: List<Comics>,
+    selectedIndex: Int,
+    onClick: (Int, Boolean) -> Unit
 ) {
 
     //Animation Card
     val (delay, easing) = state.calculateDelayAndEasing(index, columns)
-    val animation = tween<Float>(durationMillis = 1200, delayMillis = delay, easing = easing)
+    val animation = tween<Float>(durationMillis = 700, delayMillis = delay, easing = easing)
     val args = ScaleAndAlphaArgs(fromScale = 10f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
     val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
 
@@ -108,7 +132,7 @@ fun MyCard(
     val animationRotate = tween<Float>(durationMillis = 1300, delayMillis = delay, easing = easing)
     val rotation = rotation(argsRotation, animationRotate)
 
-    val animationText = tween<Float>(durationMillis = 3000, delayMillis = delay, easing = easing)
+    val animationText = tween<Float>(durationMillis = 700, delayMillis = delay, easing = easing)
     val argsText = ScaleAndAlphaArgs(fromScale = 400f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
     val (scaleText, alphaText) = scaleAndAlpha(args = argsText, animation = animationText)
 
@@ -118,7 +142,7 @@ fun MyCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
-            //.graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale)
+            .height(if (selectedIndex == index) 700.dp else 320.dp)
             .graphicsLayer(
                 alpha = alpha,
                 scaleX = scale,
@@ -129,11 +153,14 @@ fun MyCard(
             )
             .animateContentSize(
                 animationSpec = TweenSpec(
-                    durationMillis = 2000,
+                    durationMillis = 1000,
                     easing = LinearOutSlowInEasing,
 
                     )
             )
+            .clickable {
+                onClick.invoke(index, true)
+            },
     ) {
 
         Box {
@@ -144,33 +171,25 @@ fun MyCard(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .clip(RoundedCornerShape(18.dp))
-                    .height(550.dp)
                     .fillMaxWidth()
-                /*.graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale, rotationX = 0.0F, rotationY = 0.0F, rotationZ = rotation)
-            .animateContentSize(
-                animationSpec = TweenSpec(
-                    durationMillis = 3000,
-                    easing = LinearOutSlowInEasing,
-
-                    )
-            )*/
+                    .fillMaxWidth()
             )
 
             Column(
                 modifier = Modifier
-                    .size(700.dp)
+                    .fillMaxWidth()
                     .zIndex(2.0F)
-                    .graphicsLayer(
+                    /*.graphicsLayer(
                         alpha = alpha,
                         scaleX = scale,
                         scaleY = scale,
                         rotationX = rotation,
                         rotationY = 0.0F,
                         rotationZ = 0.0F
-                    )
+                    )*/
                     .animateContentSize(
                         animationSpec = TweenSpec(
-                            durationMillis = 3000,
+                            durationMillis = 800,
                             easing = LinearOutSlowInEasing,
 
                             )
@@ -179,10 +198,10 @@ fun MyCard(
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color.Transparent,
-                                Color.Black.copy(alpha= 0.7F),
-                                Color.Black,
-                                Color.Black
-                            )
+                                MaterialTheme.colors.surface.copy(alpha = 0.7F),
+                                MaterialTheme.colors.surface,
+
+                                )
                         )
                     )
                     .zIndex(1.0F)
@@ -197,7 +216,7 @@ fun MyCard(
                         .graphicsLayer(cameraDistance = scaleText)
                         .animateContentSize(
                             animationSpec = TweenSpec(
-                                durationMillis = 3000,
+                                durationMillis = 1000,
                                 easing = LinearOutSlowInEasing,
 
                                 )
@@ -248,6 +267,162 @@ fun MyCard(
         }
 
 
+    }
+}
+
+
+@Composable
+fun MyCardLandScape(
+    character: Hero,
+    index: Int = 0,
+    columns: Int,
+    state: LazyListState,
+    series: List<Series>,
+    comics: List<Comics>,
+    selectedIndex: Int,
+    onClick: (Int, Boolean) -> Unit
+) {
+
+    //Animation Card
+    val (delay, easing) = state.calculateDelayAndEasing(index, columns)
+    val animation = tween<Float>(durationMillis = 700, delayMillis = delay, easing = easing)
+    val args = ScaleAndAlphaArgs(fromScale = 10f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
+    val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
+
+    val argsRotation = RotationArgs(fromRotation = 80f, toRotation = 0f)
+    val animationRotate = tween<Float>(durationMillis = 1300, delayMillis = delay, easing = easing)
+    val rotation = rotation(argsRotation, animationRotate)
+
+    val animationText = tween<Float>(durationMillis = 700, delayMillis = delay, easing = easing)
+    val argsText = ScaleAndAlphaArgs(fromScale = 400f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
+    val (scaleText, alphaText) = scaleAndAlpha(args = argsText, animation = animationText)
+
+
+    Card(
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+            .height(320.dp)
+            //.graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale)
+            .graphicsLayer(
+                alpha = alpha,
+                scaleX = scale,
+                scaleY = scale,
+                rotationX = rotation,
+                rotationY = 0.0F,
+                rotationZ = 0.0F
+            )
+            .animateContentSize(
+                animationSpec = TweenSpec(
+                    durationMillis = 1000,
+                    easing = LinearOutSlowInEasing,
+
+                    )
+            )
+            .clickable {
+                onClick.invoke(index, true)
+            },
+    ) {
+        Box {
+
+            Row {
+                Image(
+                    painter = rememberAsyncImagePainter(character.thumbnail),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(18.dp))
+                        .height(550.dp)
+                        .fillMaxWidth(0.4F)
+                        .padding(end = 8.dp)
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .size(700.dp)
+                        .zIndex(2.0F)
+                        .animateContentSize(
+                            animationSpec = TweenSpec(
+                                durationMillis = 800,
+                                easing = LinearOutSlowInEasing,
+
+                                )
+                        )
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    MaterialTheme.colors.surface.copy(alpha = 0.7F),
+                                    MaterialTheme.colors.surface,
+
+                                    )
+                            )
+                        )
+                        .zIndex(1.0F)
+                        .height(700.dp)
+                        .fillMaxWidth(0.6F)
+                ) {
+                    item {
+                        Text(
+                            text = character.name,
+                            modifier = Modifier
+                                .padding(top = 20.dp, start = 8.dp)
+                                .graphicsLayer(cameraDistance = scaleText)
+                                .animateContentSize(
+                                    animationSpec = TweenSpec(
+                                        durationMillis = 1000,
+                                        easing = LinearOutSlowInEasing,
+
+                                        )
+                                )
+                                .background(Color.Transparent),
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    item {
+                        Box(Modifier.padding(8.dp)) {
+                            Divider(
+                                Modifier
+                                    .height(6.dp)
+                                    .width(40.dp)
+                                    .background(SecondaryColor)
+                                    .padding(start = 12.dp, top = 4.dp)
+                            )
+                        }
+                    }
+                    item {
+                        Text(
+                            text = character.description?.take(100) ?: "",
+                            modifier = Modifier.padding(top = 12.dp, start = 8.dp),
+                            fontSize = 15.sp
+                        )
+                    }
+                    item {
+                        Text(
+                            text = "Series",
+                            modifier = Modifier.padding(8.dp),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    item {
+                        MyLazyRowSeries(series)
+                    }
+                    item {
+                        Text(
+                            text = "Comics",
+                            modifier = Modifier.padding(8.dp),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    item {
+                        MyLazyRowComics(comics)
+                    }
+                }
+            }
+        }
     }
 }
 
