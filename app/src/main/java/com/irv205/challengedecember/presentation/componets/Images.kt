@@ -71,7 +71,7 @@ fun GifImage(
 @Composable
 fun ImageLogo(){
     Image(
-        painter = rememberAsyncImagePainter("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Marvel_Logo.svg/2560px-Marvel_Logo.svg.png"),
+        painter = rememberAsyncImagePainter(R.drawable.logo),
         contentDescription = null,
         contentScale = ContentScale.FillHeight,
         modifier = Modifier

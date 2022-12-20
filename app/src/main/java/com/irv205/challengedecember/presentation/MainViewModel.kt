@@ -25,24 +25,24 @@ class MainViewModel @Inject constructor(
     private val repository: MarvelRepository,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDisplatcher private val mainDispatcher: CoroutineDispatcher
-): ViewModel() {
+) : ViewModel() {
 
     private val _list = mutableStateListOf<Hero>()
-    val list : SnapshotStateList<Hero> get() = _list
+    val list: SnapshotStateList<Hero> get() = _list
 
     private val _listComics = mutableStateListOf<Comics>()
-    val listComics : SnapshotStateList<Comics> get() = _listComics
+    val listComics: SnapshotStateList<Comics> get() = _listComics
 
     private val _listSeries = mutableStateListOf<Series>()
-    val listSeries : SnapshotStateList<Series> get() = _listSeries
+    val listSeries: SnapshotStateList<Series> get() = _listSeries
 
     private val _selectedHero = mutableStateOf<Hero?>(null)
-    val selectedHero : State<Hero?> get() = _selectedHero
+    val selectedHero: State<Hero?> get() = _selectedHero
 
     private val _search = mutableStateOf("")
-    val search : State<String?> get() = _search
+    val search: State<String?> get() = _search
 
-    fun setHero(hero: Hero){
+    fun setHero(hero: Hero) {
         _selectedHero.value = hero
     }
 
@@ -52,49 +52,43 @@ class MainViewModel @Inject constructor(
 
     fun updateSearchText(text: CharSequence?) {
         _search.value = text.toString()
-        Log.d("String",text.toString())
     }
 
-    fun getHeroesList(){
+    fun getHeroesList() {
         var keyword = "A"
-        if(search.value?.isEmpty() == false){
+        if (search.value?.isEmpty() == false) {
             keyword = search.value.toString()
         }
 
-            viewModelScope.launch(ioDispatcher) {
-                when(val result = repository.getHeroes(40,keyword )){
-                    is DomainResponse.OnFailure -> {
-                        withContext(mainDispatcher){
-                            Log.e("ERRORRRRR", result.message)
-                        }
-                    }
-                    is DomainResponse.Success -> {
-                        withContext(mainDispatcher){
-                            _list.clear()
-                            _list.addAll(result.data)
-
-                        }
-                    }
-                }
-            }
-    }
-
-
-    fun getComicsList(id : Int){
-
         viewModelScope.launch(ioDispatcher) {
-            when(val result = repository.getComics(id)){
+            when (val result = repository.getHeroes(40, keyword)) {
                 is DomainResponse.OnFailure -> {
-                    withContext(mainDispatcher){
-                        Log.e("ERRORRRRR", result.message)
+                    withContext(mainDispatcher) {
+
                     }
                 }
                 is DomainResponse.Success -> {
+                    withContext(mainDispatcher) {
+                        _list.clear()
+                        _list.addAll(result.data)
 
+                    }
+                }
+            }
+        }
+    }
 
-                    withContext(mainDispatcher){
+    fun getComicsList(id: Int) {
+        viewModelScope.launch(ioDispatcher) {
+            when (val result = repository.getComics(id)) {
+                is DomainResponse.OnFailure -> {
+                    withContext(mainDispatcher) {
+
+                    }
+                }
+                is DomainResponse.Success -> {
+                    withContext(mainDispatcher) {
                         _listComics.clear()
-                        _listComics.addAll(result.data)
                         _listComics.addAll(result.data)
 
                     }
@@ -103,17 +97,16 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getSeriesList(id: Int){
-
+    fun getSeriesList(id: Int) {
         viewModelScope.launch(ioDispatcher) {
-            when(val result = repository.getSeries(id)){
+            when (val result = repository.getSeries(id)) {
                 is DomainResponse.OnFailure -> {
-                    withContext(mainDispatcher){
+                    withContext(mainDispatcher) {
                         Log.e("ERRORRRRR", result.message)
                     }
                 }
                 is DomainResponse.Success -> {
-                    withContext(mainDispatcher){
+                    withContext(mainDispatcher) {
                         _listSeries.clear()
                         _listSeries.addAll(result.data)
 
@@ -122,6 +115,4 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
-
 }
