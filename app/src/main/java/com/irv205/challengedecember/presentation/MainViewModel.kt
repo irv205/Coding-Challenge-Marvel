@@ -7,8 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.irv205.challengedecember.core.di.IODispatcher
-import com.irv205.challengedecember.core.di.MainDisplatcher
 import com.irv205.challengedecember.domain.DomainResponse
 import com.irv205.challengedecember.domain.model.Comics
 import com.irv205.challengedecember.domain.model.Hero
@@ -20,11 +18,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-@HiltViewModel
-class MainViewModel @Inject constructor(
+class MainViewModel(
     private val repository: MarvelRepository,
-    @IODispatcher private val ioDispatcher: CoroutineDispatcher,
-    @MainDisplatcher private val mainDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher,
+    private val mainDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _list = mutableStateListOf<Hero>()

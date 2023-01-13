@@ -6,26 +6,18 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import org.koin.core.module.dsl.named
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
 import javax.inject.Qualifier
 
-@Module
-@InstallIn(SingletonComponent::class)
-object DispatcherModule{
 
-    @Provides
-    @IODispatcher
-    fun providerDispatcherIo(): CoroutineDispatcher = Dispatchers.IO
-
-    @Provides
-    @MainDisplatcher
-    fun providerDispatcherMain(): CoroutineDispatcher = Dispatchers.Main
+val dispatcherModule = module {
+    singleOf(::providerDispatcherIo){named("IO")}
+    singleOf(::providerDispatcherMain){named("MAIN")}
 
 }
 
-@Retention(AnnotationRetention.BINARY)
-@Qualifier
-annotation class IODispatcher
+fun providerDispatcherIo(): CoroutineDispatcher = Dispatchers.IO
 
-@Retention(AnnotationRetention.BINARY)
-@Qualifier
-annotation class MainDisplatcher
+fun providerDispatcherMain(): CoroutineDispatcher = Dispatchers.Main

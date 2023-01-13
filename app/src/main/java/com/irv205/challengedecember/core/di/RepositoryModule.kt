@@ -6,11 +6,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
 
-    @Binds
-    abstract fun provideMarvelRepository(marvelRepositoryImp: MarvelRepositoryImp): MarvelRepository
+val repositoryModule = module {
+    singleOf(::MarvelRepositoryImp){ bind<MarvelRepository>()}
 }

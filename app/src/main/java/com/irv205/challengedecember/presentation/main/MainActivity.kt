@@ -14,15 +14,17 @@ import com.irv205.challengedecember.presentation.home.HomeBody
 import com.irv205.challengedecember.presentation.home.HomeView
 import com.irv205.challengedecember.presentation.ui.theme.ChallengeDecemberTheme
 import dagger.hilt.android.AndroidEntryPoint
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val vm by viewModel<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ChallengeDecemberTheme {
                 val navController = rememberNavController()
-                val vm: MainViewModel = viewModel()
+
                 NavHost(
 
                     navController = navController, startDestination = NavigationViews.HomeView.route){
