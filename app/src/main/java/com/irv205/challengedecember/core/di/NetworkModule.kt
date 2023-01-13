@@ -1,6 +1,7 @@
-package com.irv205.challengedecember.di
+package com.irv205.challengedecember.core.di
 
 import com.irv205.challengedecember.BuildConfig
+import com.irv205.challengedecember.data.interceptor.HashInterceptor
 import com.irv205.challengedecember.data.networkdatasource.service.MarvelService
 import dagger.Module
 import dagger.Provides
@@ -23,6 +24,7 @@ class NetworkModule {
         return OkHttpClient
             .Builder()
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(HashInterceptor())
             .callTimeout(10, TimeUnit.SECONDS)
             .connectTimeout(10, TimeUnit.SECONDS)
             .build()

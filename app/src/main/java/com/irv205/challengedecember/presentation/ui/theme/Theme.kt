@@ -1,4 +1,4 @@
-package com.irv205.challengedecember.ui.theme
+package com.irv205.challengedecember.presentation.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
@@ -7,15 +7,17 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 
 private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = PrimaryColor,
+    primaryVariant = SecondaryColor,
+    secondary = ContrastColor,
+    surface = BackgroundColorDark
 )
 
 private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = PrimaryColor,
+    primaryVariant = SecondaryColor,
+    secondary = ContrastColor,
+    surface = BackgroundColorLight
 
     /* Other default colors to override
     background = Color.White,

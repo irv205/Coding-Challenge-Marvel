@@ -1,4 +1,4 @@
-package com.irv205.challengedecember.data.model
+package com.irv205.challengedecember.data.model.hero
 
 import com.google.gson.annotations.SerializedName
 

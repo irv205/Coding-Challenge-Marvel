@@ -1,4 +1,4 @@
-package com.irv205.challengedecember.di
+package com.irv205.challengedecember.core.di
 
 import com.irv205.challengedecember.data.repository.MarvelRepositoryImp
 import com.irv205.challengedecember.domain.repository.MarvelRepository

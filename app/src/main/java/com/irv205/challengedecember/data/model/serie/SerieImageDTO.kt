@@ -1,6 +1,6 @@
-package com.irv205.challengedecember.data.model
+package com.irv205.challengedecember.data.model.hero
 
-data class HeroDTO(
+data class SerieImageDTO(
     val name: String?,
     val description: String?,
     val thumbnail: ThumbnailDTO?,

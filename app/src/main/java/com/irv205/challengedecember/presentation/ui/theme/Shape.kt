@@ -1,4 +1,4 @@
-package com.irv205.challengedecember.ui.theme
+package com.irv205.challengedecember.presentation.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
